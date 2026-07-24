@@ -5,7 +5,22 @@
 An analog-assisted cardiac feature extraction processor that directly detects R-peaks from ECG signals and outputs a digital event pulse per heartbeat, enabling heart-rate and heart-rate variability (HRV) monitoring with minimal on-chip digital complexity.
 
 ---
-
+<h2>Repository</h2>
+<p>
+  <a href="https://docs.google.com/presentation/d/18qcQKhdBwNA_3tAG34yTULziVt0hrGmls-qpCYDhvls/edit?usp=sharing">
+    Schematic and Simulations
+  </a>
+</p>
+<p>
+  <a href="https://docs.google.com/spreadsheets/d/1Dva5xNq5iXcITRApbbd2DMtIVU4WqZdsdKf1LQmGMNk/edit?usp=sharing">
+    Progress Tracker
+  </a>
+</p>
+<p>
+  <a href="https://github.com/Varchaswin/Biosignal-Foundry">
+    Layout_Updatinng
+  </a>
+</p>
 ## Overview
 
 Traditional ECG systems continuously digitize the entire ECG waveform and perform signal processing digitally. While effective, this approach increases power consumption and data bandwidth requirements.
