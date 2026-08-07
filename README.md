@@ -1,392 +1,1551 @@
 # Biosignal Foundry
 
-## Ultra-Low-Power Event-Driven ECG Sensor SoC in GF180MCU
+## Ultra-Low-Power Event-Driven ECG Sensor SoC with Analog R-Peak Detection
 
-An analog-assisted cardiac feature extraction processor that directly detects R-peaks from ECG signals and outputs a digital event pulse per heartbeat, enabling heart-rate and heart-rate variability (HRV) monitoring with minimal on-chip digital complexity.
-
----
-<h2>Repository</h2>
-<p>
-  <a href="https://docs.google.com/presentation/d/18qcQKhdBwNA_3tAG34yTULziVt0hrGmls-qpCYDhvls/edit?usp=sharing">
-    Schematic and Simulations
-  </a>
-</p>
-<p>
-  <a href="https://docs.google.com/spreadsheets/d/1Dva5xNq5iXcITRApbbd2DMtIVU4WqZdsdKf1LQmGMNk/edit?usp=sharing">
-    Progress Tracker
-  </a>
-</p>
-<p>
-  <a href="https://github.com/Varchaswin/Biosignal-Foundry">
-    Layout_Updatinng
-  </a>
-</p>
-## Overview
-
-Traditional ECG systems continuously digitize the entire ECG waveform and perform signal processing digitally. While effective, this approach increases power consumption and data bandwidth requirements.
-
-This project explores an alternative architecture in which critical cardiac features are extracted directly in the analog domain before any digitization. Instead of transmitting a full ECG waveform, the chip detects each heartbeat and outputs a single digital pulse (DET) per R-peak. An off-chip MCU timestamps these pulses using a hardware timer, computes R-R intervals, and derives heart rate and HRV metrics in firmware — keeping the on-chip design focused, low-power, and tapeout-feasible.
-
-The project is being developed as part of the IEEE SSCS Chipathon 2026 using the GF180MCU open-source 180 nm process.
+**IEEE SSCS Chipathon 2026 — Team B08**
+**Track B — Circuits for Sensors**
+**Technology: GlobalFoundries GF180MCU 180 nm**
 
 ---
 
-## Key Features
+## Project Overview
 
-- Ultra-low-power ECG acquisition via chopper-stabilized CCIA front-end
-- Fully analog Pan-Tompkins QRS feature extraction engine
-- Single DET pulse output per R-peak — MCU computes timing metrics
-- Event-driven architecture: no continuous ADC on the critical path
-- Target power < 50 µW total on-chip
-- Designed for wearable and implantable applications
-- Implemented in GF180MCU 180 nm, targeting Chipathon Block B (500 µm × 1100 µm)
+**Biosignal Foundry** is developing an ultra-low-power, event-driven ECG sensor SoC that directly extracts cardiac timing information from ECG signals using an analog signal-processing chain.
 
----
+Conventional ECG systems continuously amplify, digitize, and process the complete ECG waveform. Although this approach provides full waveform information, a continuously operating ADC and digital signal-processing backend increase:
 
-## Motivation
+* Power consumption
+* Silicon area
+* Digital switching activity
+* Data bandwidth
+* Memory requirements
+* System complexity
 
-Many biomedical monitoring applications require only the timing of heartbeats rather than the complete ECG waveform. Examples include:
+Our architecture instead performs the critical **QRS feature extraction and R-peak detection operations directly in the analog domain**.
 
-- Heart rate monitoring
-- Heart rate variability (HRV) analysis
-- Arrhythmia screening
-- Long-term ambulatory monitoring
-- Implantable sensing systems
+The chip processes the ECG waveform through a low-noise analog front end and analog QRS-detection chain and generates a digital **DET pulse for each detected heartbeat**.
 
-By extracting cardiac timing information directly on-chip in the analog domain and offloading computation to an MCU, significant reductions in on-chip power, complexity, and tapeout risk are achieved — while retaining full clinical utility of the cardiac timing data.
+The current architecture additionally exposes an **RR_OUT** interface for R-R interval data.
+
+The design is implemented in the **GlobalFoundries GF180MCU 180 nm open-source CMOS process** as part of the **IEEE Solid-State Circuits Society Chipathon 2026**.
 
 ---
 
-## System Architecture
+# Project Resources
+
+The following resources document the design, simulations, project progress, and original Chipathon proposal.
+
+## Schematic & Simulation Results
+
+[**Schematic and Simulations — Google Slides**](https://docs.google.com/presentation/d/18qcQKhdBwNA_3tAG34yTULziVt0hrGmls-qpCYDhvls/edit?usp=sharing)
+
+Contains:
+
+* Circuit schematics
+* Block-level simulations
+* Top-level simulations
+* Design evolution
+* Simulation results
+* Design review material
+
+---
+
+## Project Progress Tracker
+
+[**B08 Chipathon Progress Tracker — Google Sheets**](https://docs.google.com/spreadsheets/d/1Dva5xNq5iXcITRApbbd2DMtIVU4WqZdsdKf1LQmGMNk/edit?usp=sharing)
+
+Used to track:
+
+* Circuit ownership
+* Schematic progress
+* Simulation progress
+* Layout progress
+* Verification status
+* Project milestones
+
+---
+
+## Pin Assignment / Chip Interface
+
+[**Chipathon Pin Assignment — Google Sheets**](https://docs.google.com/spreadsheets/d/1QQbtaFOqn0G63YKYgDVndsNMXKOrIu-xAYuyjMj1dco/edit?gid=0#gid=0)
+
+Defines the current analog, digital, power, clock, and output pin requirements for the design.
+
+---
+
+## IEEE SSCS Chipathon Project Issue
+
+[**Team B08 Biosignal Foundry — Chipathon Issue #63**](https://github.com/sscs-ose/sscs-chipathon-2026/issues/63)
+
+Contains the original:
+
+* Project registration
+* Team information
+* Initial system architecture
+* Proposed specifications
+* Original project scope
+* Chipathon proposal
+
+> **Note:** The architecture in the original proposal represents the initial design concept. The architecture documented in this README reflects the latest implementation following schematic design, simulation, integration, and physical layout.
+
+---
+
+# Current Project Status
+
+The project has completed schematic design, simulation, integration, and physical layout.
+
+The design is currently undergoing **Layout Versus Schematic verification (LVS)**.
+
+| Development Stage                | Status             |
+| -------------------------------- | ------------------ |
+| Project definition               | ✅ Complete         |
+| Architecture definition          | ✅ Complete         |
+| Architecture freeze              | ✅ Complete         |
+| Circuit specifications           | ✅ Complete         |
+| OTA design                       | ✅ Complete         |
+| CCIA / instrumentation amplifier | ✅ Complete         |
+| Analog filtering                 | ✅ Complete         |
+| QRS feature-extraction chain     | ✅ Complete         |
+| Threshold detector               | ✅ Complete         |
+| Bias and reference circuitry     | ✅ Complete         |
+| Block-level schematics           | ✅ Complete         |
+| Block-level simulations          | ✅ Complete         |
+| Top-level schematic integration  | ✅ Complete         |
+| Top-level simulations            | ✅ Complete         |
+| Block-level layout               | ✅ Complete         |
+| Top-level physical layout        | ✅ Complete         |
+| LVS                              | 🔄 **In Progress** |
+| Parasitic extraction             | ⬜ Pending          |
+| Post-layout simulations          | ⬜ Pending          |
+| Final verification               | ⬜ Pending          |
+| Final GDS preparation            | ⬜ Pending          |
+| Tapeout submission               | ⬜ Pending          |
+
+### Current Milestone
+
+> **All schematics, pre-layout simulations, top-level integration, and physical layout have been completed. The design is currently undergoing LVS verification.**
+
+---
+
+# 1. Motivation
+
+Continuous physiological monitoring places stringent requirements on:
+
+* Power consumption
+* Silicon area
+* Signal quality
+* Data bandwidth
+* Battery life
+* Computational complexity
+
+A conventional ECG signal-processing system typically follows:
+
+```text
+ECG Electrodes
+      ↓
+Instrumentation Amplifier
+      ↓
+Analog Filter
+      ↓
+ADC
+      ↓
+Digital Signal Processor
+      ↓
+QRS Detection
+      ↓
+Heart Rate / HRV
+```
+
+This architecture is powerful because the complete ECG waveform remains available.
+
+However, many ultra-low-power biomedical applications primarily require **cardiac timing information** instead of continuous access to the full ECG waveform.
+
+Examples include:
+
+* Continuous heart-rate monitoring
+* Heart-rate-variability analysis
+* Long-term ambulatory monitoring
+* Physiological stress monitoring
+* Implantable sensing
+* Wearable cardiac monitoring
+* Activity-associated heart-rate monitoring
+* Event-driven biomedical sensing
+
+For such applications, continuously digitizing the complete ECG waveform may consume unnecessary power and communication bandwidth.
+
+The objective of Biosignal Foundry is therefore to move the critical cardiac feature-extraction operations into the **analog domain before conventional continuous digitization**.
+
+---
+
+# 2. Core Concept
+
+The fundamental architecture is:
+
+```text
+ECG
+ ↓
+Analog Acquisition
+ ↓
+Analog Signal Conditioning
+ ↓
+Analog QRS Feature Extraction
+ ↓
+R-Peak Detection
+ ↓
+Digital Cardiac Event
+```
+
+Instead of generating a continuous digital ECG data stream, the system provides an event corresponding to a detected heartbeat.
+
+The primary event output is:
+
+```text
+DET
+```
+
+where ideally:
+
+```text
+1 QRS Complex
+      ↓
+1 R-Peak Detection
+      ↓
+1 DET Pulse
+```
+
+The current chip interface also provides:
+
+```text
+RR_OUT
+```
+
+for R-R interval data output.
+
+---
+
+# 3. High-Level System Architecture
 
 ```mermaid
 flowchart LR
+
     subgraph OFF["Off-Chip"]
-        A[ECG Electrodes]
-        B[Input Protection\nESD + Patient Safety]
-        CLK[Clock / Timing Generator]
-        MCU[MCU / Host Processor\nR-R intervals, HR, HRV]
+        ECG["ECG Electrodes"]
+        REF["VREF / VBIAS"]
+        CLK["External Clock"]
+        HOST["MCU / Host Processor"]
     end
 
-    subgraph ON["On-Chip — GF180MCU"]
-        C[Low-Noise INA\nChopper-stabilized CCIA]
-        D[Analog Bandpass Filter\n0.5–100 Hz]
+    subgraph CHIP["Biosignal Foundry ECG SoC — GF180MCU"]
 
-        subgraph QRS["QRS Feature Extraction Engine"]
-            E1[Differentiator\nd/dt]
-            E2[Squaring Block\n²]
-            E3[Moving Window Integrator\n150 ms]
-            E4[Adaptive Threshold Detector]
-            E5[Refractory Period Logic\nRR-adaptive blanking]
+        subgraph ANALOG["3.3 V Analog Domain"]
+            CCIA["Chopper-Stabilized CCIA"]
+            BPF["Analog Bandpass Filter"]
+            DIFF["Differentiator"]
+            SQR["Squaring / Nonlinear Stage"]
+            MWI["Moving Window Integrator"]
+            THR["Threshold Detector"]
         end
 
-        BIAS[Bias and Reference Generator\nBGR reuse + current mirrors]
-        DET[DET Output\nR-peak event pulse]
+        subgraph DIGITAL["1.8 V Digital Domain"]
+            DETGEN["DET Event Generation"]
+            RR["R-R Interval Processing / Output"]
+        end
+
+        BIAS["Bias & Reference Distribution"]
     end
 
-    A --> B --> C --> D
-    D --> E1 --> E2 --> E3 --> E4 --> E5 --> DET
-    DET --> MCU
-    CLK --> QRS
-    BIAS -.->|bias| C
-    BIAS -.->|bias| D
-    BIAS -.->|bias| QRS
+    ECG --> CCIA
+    REF --> ANALOG
+
+    CCIA --> BPF
+    BPF --> DIFF
+    DIFF --> SQR
+    SQR --> MWI
+    MWI --> THR
+    THR --> DETGEN
+
+    DETGEN -->|DET| HOST
+    DETGEN --> RR
+    RR -->|RR_OUT| HOST
+
+    CLK --> DIGITAL
+
+    BIAS -.-> CCIA
+    BIAS -.-> BPF
+    BIAS -.-> DIFF
+    BIAS -.-> SQR
+    BIAS -.-> MWI
+    BIAS -.-> THR
 ```
 
-> The chip outputs one digital pulse per detected R-peak on the DET pin. The MCU measures inter-pulse intervals to compute R-R intervals, heart rate, and HRV — no on-chip counter or digital back-end required.
+---
+
+# 4. Implemented Signal Chain
+
+The primary ECG-processing path is:
+
+```text
+INP / INN
+    ↓
+Chopper-Stabilized CCIA
+    ↓
+Analog Bandpass Filter
+    ↓
+Differentiator
+    ↓
+Squaring / Nonlinear Stage
+    ↓
+Moving Window Integrator
+    ↓
+Threshold Detector
+    ↓
+R-Peak Event Detection
+    ↓
+    ├─────────────► DET
+    │
+    └─────────────► R-R Processing
+                         ↓
+                      RR_OUT
+```
+
+The analog QRS-processing architecture is inspired by the fundamental operations used in Pan-Tompkins-type QRS detection.
 
 ---
 
-## Target Specifications
+# 5. Chopper-Stabilized ECG Front End
 
-| Parameter | Target | Notes |
-|---|---|---|
-| Process | GF180MCU 180 nm | Open-source PDK |
-| Die block | Block B — 500 µm × 1100 µm | 16 available pins |
-| Supply voltage | 3.3 V analog | |
-| ECG bandwidth | 0.5–150 Hz | |
-| Heart rate range | 30–220 BPM | |
-| R-peak detection accuracy | > 95% | Pan-Tompkins analog |
-| Total on-chip power | < 50 µW | |
-| INA gain | 40 dB | |
-| INA noise | < 200 nV/√Hz | |
-| INA CMRR | > 90 dB | |
-| INA input impedance | > 100 MΩ | Chopper-stabilized |
-| Chopper frequency | 19.2 kHz | = CLK/4 |
-| Signal pins | 6 | INP, INN, VREF, VBIAS, CLK, DET |
-| Output | DET pulse per R-peak | R-R timing done off-chip |
-| Application | Wearable and implantable cardiac sensing | |
+The first major block is the ECG instrumentation amplifier.
+
+A **chopper-stabilized capacitively coupled instrumentation amplifier (CCIA)** is used to amplify the low-amplitude ECG signal while reducing the influence of low-frequency amplifier noise.
+
+The front end is intended to provide:
+
+* High differential gain
+* High common-mode rejection
+* High input impedance
+* Low input-referred noise
+* Low-frequency flicker-noise suppression
+* Baseline and DC offset rejection
+* Controlled output common-mode voltage
+* Compatibility with subsequent analog filtering stages
+
+## Target Front-End Specifications
+
+| Parameter            |      Target |
+| -------------------- | ----------: |
+| Analog supply        |       3.3 V |
+| Voltage gain         |      ~40 dB |
+| Input impedance      |     >100 MΩ |
+| CMRR                 |      >90 dB |
+| Input-referred noise | <200 nV/√Hz |
+| Chopper frequency    |   ~19.2 kHz |
+
+### Status
+
+**Schematic:** ✅ Complete
+**Simulation:** ✅ Complete
+**Layout:** ✅ Complete
+
+---
+
+# 6. Analog Bandpass Filter
+
+Following amplification, the ECG signal passes through an integrated analog filtering stage.
+
+The filter is intended to suppress:
+
+* Electrode DC offsets
+* Baseline wander
+* Very-low-frequency motion artifacts
+* High-frequency interference
+* Out-of-band noise
+
+The target ECG bandwidth is approximately:
+
+```text
+0.5 Hz – 150 Hz
+```
+
+The QRS-processing path further emphasizes the frequency components most useful for R-peak detection.
+
+OTA-based implementations are used where appropriate to enable low-frequency integrated filtering.
+
+### Status
+
+**Schematic:** ✅ Complete
+**Simulation:** ✅ Complete
+**Layout:** ✅ Complete
 
 ---
 
-## On-Chip Block Summary
+# 7. Analog QRS Feature-Extraction Engine
 
-| Block | Area (est.) | Status | Owner |
-|---|---|---|---|
-| CCIA / INA front-end | ~0.18 mm² | In design | Leah |
-| QRS analog engine | ~0.12 mm² | In design | Yutong |
-| OTA family (5T + cascode variant) | ~0.04 mm² | Reuse + adapt | Wenxin |
-| Bias cell + current mirrors | ~0.02 mm² | In design | Fayruj |
-| Bandgap reference (BGR) | ~0.03 mm² | Reuse (IIC-OSic) | Fayruj |
-| I/O ring (6 signal pins) | ~0.04 mm² | Block B pad frame | Surya |
-| Top-level integration + testbench | — | In progress | Surya |
-| **Total** | **~0.43 mm²** | | |
-| Block B capacity | 0.55 mm² | ~0.12 mm² margin | |
+The principal signal-processing component of the project is the analog QRS feature-extraction chain.
 
-> **ADC:** The on-chip ΔΣ ADC has been descoped from this revision. Raw ECG waveform capture is deferred to a future revision or can be performed off-chip. This decision directly addresses reviewer feedback on feasibility and scope.
+Rather than digitizing the complete ECG waveform before QRS processing, several signal-processing operations are performed directly using analog circuits.
+
+The primary stages are:
+
+1. Differentiation
+2. Nonlinear / squaring operation
+3. Moving-window integration
+4. Threshold detection
+5. Event generation
 
 ---
+
+## 7.1 Differentiator
+
+The differentiator emphasizes rapid changes in the ECG waveform.
+
+The QRS complex generally has a significantly greater slope than the slower P- and T-wave components.
+
+Conceptually:
+
+```text
+Vdiff ∝ dVECG / dt
+```
+
+The differentiator therefore increases the contrast between the QRS complex and slower ECG components.
+
+### Status
+
+**Schematic:** ✅ Complete
+**Simulation:** ✅ Complete
+**Layout:** ✅ Complete
+
+---
+
+## 7.2 Squaring / Nonlinear Stage
+
+The differentiated waveform is passed through a nonlinear stage.
+
+This operation:
+
+* Reduces polarity dependence
+* Emphasizes high-slope signal components
+* Suppresses small background variations
+* Increases QRS-to-background contrast
+
+Conceptually:
+
+```text
+Vsquare ∝ Vdiff²
+```
+
+or an equivalent transistor-domain nonlinear approximation.
+
+### Status
+
+**Schematic:** ✅ Complete
+**Simulation:** ✅ Complete
+**Layout:** ✅ Complete
+
+---
+
+## 7.3 Moving Window Integrator
+
+The nonlinear waveform is subsequently integrated over a finite time window.
+
+This provides information related to both:
+
+* QRS energy
+* QRS duration
+
+The integration window is selected to correspond approximately to the temporal duration of the QRS complex.
+
+A nominal range is:
+
+```text
+~80 – 150 ms
+```
+
+depending on the final circuit implementation.
+
+### Status
+
+**Schematic:** ✅ Complete
+**Simulation:** ✅ Complete
+**Layout:** ✅ Complete
+
+---
+
+## 7.4 Threshold Detection
+
+The integrated waveform is compared against a detection threshold.
+
+When the processed signal exceeds the threshold, the circuit identifies a candidate heartbeat event.
+
+The threshold stage therefore converts an analog feature waveform into an event representation.
+
+### Status
+
+**Schematic:** ✅ Complete
+**Simulation:** ✅ Complete
+**Layout:** ✅ Complete
+
+---
+
+## 7.5 Event and Pulse Generation
+
+Following threshold detection, event-conditioning circuitry produces the digital heartbeat event.
+
+The intended relationship is:
+
+```text
+Processed ECG
+     ↓
+Threshold Crossing
+     ↓
+R-Peak Detection
+     ↓
+DET Pulse
+```
+
+The goal is:
+
+```text
+1 detected heartbeat → 1 DET pulse
+```
+
+---
+
+# 8. DET Event Output
+
+The primary event-driven output is:
+
+```text
+DET
+```
+
+`DET` provides a digital pulse corresponding to an R-peak detection.
+
+This output allows external hardware to directly observe heartbeat events without requiring continuous access to the internal analog ECG waveform.
+
+Possible external uses include:
+
+* Heartbeat timestamping
+* Heart-rate calculation
+* HRV analysis
+* Event logging
+* External validation
+* Wireless transmission
+
+---
+
+# 9. R-R Interval Output
+
+The current interface additionally contains:
+
+```text
+RR_OUT
+```
+
+`RR_OUT` provides R-R interval data from the cardiac timing path.
+
+Conceptually:
+
+```text
+R-Peak Events
+      ↓
+Timing Measurement
+      ↓
+R-R Interval
+      ↓
+RR_OUT
+```
+
+Providing both `DET` and `RR_OUT` allows access to:
+
+* Immediate heartbeat events
+* Beat-to-beat interval information
+
+---
+
+# 10. Evolution from the Original Proposal
+
+The architecture evolved during the Chipathon design process.
+
+The original proposal considered a broader architecture incorporating additional waveform-digitization and digital-processing functionality.
+
+During circuit development, the project was focused toward the primary research objective:
+
+> **Ultra-low-power analog ECG feature extraction with event-driven cardiac detection.**
+
+The current architecture therefore emphasizes:
+
+```text
+Analog ECG Acquisition
+        +
+Analog Filtering
+        +
+Analog QRS Processing
+        +
+R-Peak Detection
+        +
+DET / RR_OUT
+```
+
+This reduces unnecessary circuit complexity while retaining the primary physiological timing information required for cardiac monitoring.
+
+---
+
+# 11. ADC Design Decision
+
+An ADC was considered during the early architecture phase.
+
+A continuously operating ADC was subsequently removed from the critical signal path for the current revision.
+
+The decision reduces:
+
+* Silicon area
+* Power consumption
+* Integration complexity
+* Verification complexity
+* Tapeout risk
+
+The present design therefore focuses primarily on **analog feature extraction and event generation**.
+
+Raw ECG waveform acquisition can be performed externally during characterization or incorporated into a future version of the SoC.
+
+---
+
+# 12. OTA Building Blocks
+
+Operational transconductance amplifiers form important building blocks throughout the analog signal-processing chain.
+
+Applications include:
+
+* Front-end amplification
+* Filtering
+* Differentiation
+* Integration
+* Bias support
+* Threshold-related analog circuitry
+
+OTA design requires tradeoffs between:
+
+* DC gain
+* Transconductance
+* Bandwidth
+* Stability
+* Noise
+* Output swing
+* Power consumption
+* Silicon area
+
+Reusable OTA structures were employed where possible to reduce design complexity and improve consistency across the system.
+
+### Status
+
+**Design:** ✅ Complete
+**Simulation:** ✅ Complete
+**Layout:** ✅ Complete
+
+---
+
+# 13. Bias and Reference Generation
+
+The analog circuitry requires stable bias currents and voltage references.
+
+The bias and reference subsystem supports:
+
+* CCIA biasing
+* OTA bias currents
+* Filter operation
+* QRS-processing circuitry
+* Comparator operation
+* Analog references
+
+External pins are also provided for:
+
+```text
+VREF
+VBIAS
+```
+
+to provide reference and bias-trim capability during operation and characterization.
+
+### Status
+
+**Schematic:** ✅ Complete
+**Simulation:** ✅ Complete
+**Layout:** ✅ Complete
+
+---
+
+# 14. Technology
+
+The design is implemented using:
+
+## GlobalFoundries GF180MCU
+
+| Parameter             | Value                    |
+| --------------------- | ------------------------ |
+| Technology            | GF180MCU                 |
+| Nominal process node  | 180 nm                   |
+| Design type           | Mixed-signal CMOS        |
+| Analog supply         | 3.3 V                    |
+| Digital supply        | 1.8 V                    |
+| Development ecosystem | Open-source              |
+| Program               | IEEE SSCS Chipathon 2026 |
+
+---
+
+# 15. Chipathon Block
+
+The design targets:
+
+**IEEE SSCS Chipathon 2026 — Block B**
+
+Approximate available block dimensions:
+
+```text
+500 µm × 1100 µm
+```
+
+The architecture has been designed to fit within the available Chipathon area and interface constraints.
+
+---
+
+# 16. Target Specifications
+
+| Parameter                  |                         Target |
+| -------------------------- | -----------------------------: |
+| Process                    |                GF180MCU 180 nm |
+| Chipathon Track            | Track B — Circuits for Sensors |
+| Chipathon Team             |        B08 — Biosignal Foundry |
+| Block                      |                        Block B |
+| Approximate block size     |               500 µm × 1100 µm |
+| Analog supply              |                          3.3 V |
+| Digital supply             |                          1.8 V |
+| ECG bandwidth              |                    ~0.5–150 Hz |
+| Heart-rate range           |                    ~30–220 BPM |
+| Front-end gain             |                         ~40 dB |
+| CMRR                       |                         >90 dB |
+| Input impedance            |                        >100 MΩ |
+| Chopper frequency          |                      ~19.2 kHz |
+| R-peak detection target    |                           >95% |
+| Target total on-chip power |                         <50 µW |
+| Primary event output       |                            DET |
+| R-R interval output        |                         RR_OUT |
+| Continuous ADC             |                       Not used |
+| Total external pins        |                             11 |
+
+---
+
+# 17. Chip Interface and Pin Requirements
+
+The current SoC requires **11 external connections**.
+
+These include:
+
+* Two ECG inputs
+* Two analog reference/bias inputs
+* Analog power and ground
+* Digital power and ground
+* One digital clock input
+* Two digital outputs
 
 ## Pin Assignment
 
-| Pin | Direction | Type | Function |
-|---|---|---|---|
-| INP | In | Analog | ECG differential input (+) |
-| INN | In | Analog | ECG differential input (−) |
-| VREF | In | Analog | Voltage reference input |
-| VBIAS | In | Analog | Bias trim input |
-| CLK | In | Digital | Off-chip clock input |
-| DET | Out | Digital | R-peak event pulse (one per heartbeat) |
-
-Supply rails (VDD, GND) are provided by the Chipathon shared power infrastructure and are not counted as signal pins.
-
----
-
-## Work Distribution
-
-| Person | Role | Owns |
-|---|---|---|
-| Surya Varchasvi Devaraj | Team lead, integration | Top-level netlist, testbench, I/O ring, system architecture |
-| Wenxin Zeng | OTA design | 5T OTA (reuse + adapt), cascode variant for CCIA |
-| Yutong Wu | QRS engine | OTA-C BPF, differentiator, squaring cell, MWI, threshold comparators, refractory timer, DET pulse conditioner |
-| Leah Berube | CCIA / INA | Chopper switches, feedback cap array, DC servo loop, impedance boost, CMFB |
-| Fayruj Fathima | Bias and reference | Beta-multiplier bias cell, current mirror array, BGR instantiation, VREF divider |
+| Pin Name   | Direction | Type    | Description                     |
+| ---------- | --------- | ------- | ------------------------------- |
+| **INP**    | Input     | Analog  | ECG differential input pair     |
+| **INN**    | Input     | Analog  | ECG differential input pair     |
+| **VREF**   | Input     | Analog  | Reference voltage and bias trim |
+| **VBIAS**  | Input     | Analog  | Reference voltage and bias trim |
+| **VDD_A**  | Supply    | Power   | Analog supply — 3.3 V           |
+| **GND_A**  | Supply    | Power   | Analog ground                   |
+| **VDD_D**  | Supply    | Power   | Digital supply — 1.8 V          |
+| **GND_D**  | Supply    | Power   | Digital ground                  |
+| **CLK**    | Input     | Digital | Off-chip clock                  |
+| **DET**    | Output    | Digital | R-peak event pulse              |
+| **RR_OUT** | Output    | Digital | R-R interval data output        |
 
 ---
 
-## Design Decisions Log
+## Pin Count Summary
 
-| Decision | Rationale |
-|---|---|
-| ADC removed from on-chip scope | Reviewer consensus: reuse or take off-chip. Reduces area by ~0.19 mm² and eliminates highest-complexity block. |
-| R-R counter and digital back-end removed | MCU handles timing trivially via input-capture GPIO. Simplifies chip to pure analog + one digital output pin. |
-| BGR reused from IIC-OSic reference cell | Reviewer suggestion: reuse existing cells. Saves ~1 week of design time for Person 1. |
-| OTA topology reused from agurlask/sample-ota_gf180mcuD | 5-transistor PMOS-input OTA in GF180MCU. Cascode load variant designed for CCIA (≥ 60 dB gain). |
-| Clock remains off-chip | Removes ring oscillator / FLL design risk. Off-chip crystal provides CLK. |
-| DRL circuit off-chip | Standard in ECG front-end PCB. Not required on-chip for Chipathon demonstration. |
-| Block B selected (500 µm × 1100 µm) | Revised area ~0.43 mm² fits with ~0.12 mm² margin. 6 signal pins within 16-pin allocation. |
-| EWMA threshold update off-chip | Adaptive threshold time constants remain an open item; initial implementation uses fixed thresholds on-chip with EWMA deferred to MCU firmware. |
-
----
-
-## Major Building Blocks
-
-### Low-Noise Instrumentation Amplifier (CCIA)
-
-- Chopper-stabilized capacitively-coupled instrumentation amplifier
-- 2-stage fully differential OTA, DC gain 60–80 dB, GBW 1 MHz
-- Chopper frequency 19.2 kHz (= CLK/4, lands on decimation null)
-- DC servo loop for baseline wander rejection
-- Impedance boost loop, input impedance > 100 MΩ
-- CMFB, output CM = 1.65 V
-- Gain: 40 dB | Noise: < 200 nV/√Hz | CMRR: > 90 dB
-
-### Analog Bandpass Filter
-
-- OTA-C topology, 0.5–100 Hz passband
-- Reuses OTA cell from the shared OTA family
-
-### QRS Feature Extraction Engine
-
-- **Differentiator:** OTA-C, ~30 ms time constant, highlights QRS slope
-- **Squaring block:** Gilbert-type or MOSFET-in-saturation, produces V² output
-- **Moving window integrator:** OTA + ~15 pF cap, 150 ms window
-- **Adaptive threshold detector:** Dual comparator with EWMA-updated thresholds
-- **Refractory period logic:** RR-adaptive blanking window, supports 30–220 BPM
-
-### Bias and Reference Generator
-
-- Current reference: self-biased beta-multiplier
-- Bandgap reference: reused IIC-OSic GF180MCU BGR cell (Banba-type)
-- VREF = 1.65 V via resistor divider
-- PMOS/NMOS mirror array distributes IBIAS to all blocks
-
-### OTA Family
-
-- Base cell: 5-transistor PMOS-input OTA (adapted from agurlask/sample-ota_gf180mcuD)
-- Devices: `pfet_03v3` input pair, `nfet_03v3` mirror load, `pfet_03v3` tail
-- Cascode load variant for CCIA: adds `nfet_03v3` cascode pair, achieves ≥ 60 dB DC gain
-- Two sizing variants: CCIA (GBW 1 MHz, Itail ~30 µA) and QRS/filter (GBW 50–100 kHz, Itail ~5 µA)
+| Category          | Pins         |  Count |
+| ----------------- | ------------ | -----: |
+| ECG inputs        | INP, INN     |      2 |
+| Analog references | VREF, VBIAS  |      2 |
+| Analog power      | VDD_A, GND_A |      2 |
+| Digital power     | VDD_D, GND_D |      2 |
+| Digital input     | CLK          |      1 |
+| Digital outputs   | DET, RR_OUT  |      2 |
+| **Total**         |              | **11** |
 
 ---
 
-## Verification Plan
-
-### Algorithm-Level Verification
-
-- MIT-BIH Arrhythmia Database
-- Python reference implementation of analog Pan-Tompkins chain
-- Detection accuracy evaluation (target > 95%)
-
-### Circuit-Level Verification
-
-- AC analysis: gain, bandwidth, CMRR, PSRR per block
-- Noise analysis: input-referred noise, noise floor
-- Transient simulations with synthetic ECG stimulus (60–120 BPM)
-- Corner simulations (TT, FF, SS, FS, SF)
-- Monte Carlo simulations for mismatch sensitivity
-
-### Post-Layout Verification
-
-- Parasitic extraction (PEX)
-- Post-layout transient analysis
-- Power estimation
-
----
-
-## Key Schedule Milestones
-
-| Date | Milestone |
-|---|---|
-| July 3, 2026 | Schematic review — all blocks must have schematics and preliminary simulation |
-| July 10, 2026 | Block-level simulation review |
-| July 17, 2026 | Top-level simulation + go/no-go gate |
-| July 31, 2026 | DRC dry-run |
-| August 14, 2026 | Block layout review |
-| August 21, 2026 | Top-level layout review + DRC dry-run |
-| August 28, 2026 | Final chip review and GDS submission |
-
----
-
-## Repository Structure
+# 18. External Interface Diagram
 
 ```text
-biosignal-foundry-ecg-soc/
-│
-├── README.md
-│
-├── docs/
-│   ├── architecture.md
-│   ├── specifications.md
-│   ├── design_decisions.md
-│   ├── block_diagrams/
-│   ├── meeting_notes/
-│   └── references/
-│
-├── system/
-│   ├── requirements.md
-│   ├── signal_chain.md
-│   └── power_budget.xlsx
-│
-├── analog/
-│   ├── afe/
-│   │   ├── instrumentation_amplifier/
-│   │   ├── input_protection/
-│   │   └── biasing/
-│   │
-│   ├── filters/
-│   │   ├── bandpass/
-│   │   └── highpass/
-│   │
-│   ├── qrs_detector/
-│   │   ├── differentiator/
-│   │   ├── squaring_block/
-│   │   ├── moving_window_integrator/
-│   │   ├── threshold_detector/
-│   │   └── refractory_timer/
-│   │
-│   ├── ota/
-│   │   ├── ota_5t_base/
-│   │   └── ota_cascode/
-│   │
-│   └── biasing/
-│       ├── bias_cell/
-│       └── bgr/
-│
-├── simulations/
-│   ├── ecg_datasets/
-│   │   └── mit_bih/
-│   │
-│   ├── python/
-│   │   ├── algorithm_model/
-│   │   ├── validation/
-│   │   └── plotting/
-│   │
-│   └── testbenches/
-│       ├── tb_ota/
-│       ├── tb_ccia/
-│       ├── tb_bpf/
-│       ├── tb_qrs_engine/
-│       └── tb_toplevel/
-│
-├── layout/
-│   ├── floorplan/
-│   ├── blocks/
-│   └── final_chip/
-│
-├── verification/
-│   ├── ac_analysis/
-│   ├── transient_analysis/
-│   ├── noise_analysis/
-│   ├── corner_sims/
-│   ├── monte_carlo/
-│   └── postlayout/
-│
-├── tapeout/
-│   ├── gds/
-│   ├── reports/
-│   └── final_submission/
-│
-└── images/
-    ├── architecture/
-    ├── simulation_results/
-    └── layout_snapshots/
+                    ┌────────────────────────────────┐
+                    │                                │
+        INP  ──────►│                                │
+        INN  ──────►│                                │
+                    │                                │
+       VREF  ──────►│                                │
+      VBIAS  ──────►│                                │
+                    │                                │
+      VDD_A  ──────►│       BIOSIGNAL FOUNDRY       │
+      GND_A  ──────►│          ECG SoC               │
+                    │                                │
+                    │          GF180MCU               │
+      VDD_D  ──────►│                                │
+      GND_D  ──────►│                                │
+                    │                                │
+        CLK  ──────►│                                │
+                    │                                │
+                    │                         DET ────►
+                    │                                │
+                    │                      RR_OUT ────►
+                    │                                │
+                    └────────────────────────────────┘
 ```
 
 ---
 
-## Repository Status
+# 19. Analog Supply Domain
 
-- [x] Project definition
-- [x] Architecture freeze
-- [x] Design decisions documented
-- [ ] OTA characterization (Wenxin)
-- [ ] CCIA / INA schematic (Leah)
-- [ ] QRS engine schematic (Yutong)
-- [ ] Bias cell + BGR (Fayruj)
-- [ ] Top-level integration (Surya)
-- [ ] Block-level simulations
-- [ ] Top-level system simulation
-- [ ] Layout
-- [ ] Post-layout verification
-- [ ] Final tapeout submission
+The analog signal-processing circuitry operates from:
 
----
+```text
+VDD_A = 3.3 V
+GND_A = Analog Ground
+```
 
-## Chipathon 2026
+The analog domain primarily supports:
 
-This project is developed as part of the IEEE Solid-State Circuits Society (SSCS) Chipathon 2026, Track B — Circuits for Sensors.
+* Chopper-stabilized CCIA
+* Analog filters
+* OTAs
+* Differentiator
+* Nonlinear processing
+* Moving-window integration
+* Analog threshold circuitry
+* Bias and reference circuitry
 
-- Die block: Block B (500 µm × 1100 µm, 16 pins)
-- Process: GF180MCU (GlobalFoundries 180 nm open-source PDK)
-- Tools: Xschem, ngspice, KLayout, iic-osic-tools Docker environment
+Separating the analog and digital supplies helps reduce digital switching noise coupling into the sensitive ECG signal path.
 
 ---
 
-## Team
+# 20. Digital Supply Domain
 
-**Biosignal Foundry**
+The digital circuitry operates from:
 
-| Name | Role |
-|---|---|
-| Surya Varchasvi Devaraj | Team Lead, System Architecture, Integration |
-| Wenxin Zeng | CCIA / Instrumentation Amplifier |
-| Leah Berube | OTA Design |
-| Fayruj Fathima | QRS Feature Extraction Engine |
-| Yutong Wu | Bias and Reference Generation |
+```text
+VDD_D = 1.8 V
+GND_D = Digital Ground
+```
+
+The digital domain supports the digital/timing-related portions of the system, including:
+
+* Clock-related circuitry
+* DET event generation
+* R-R timing/output circuitry
+* Digital output stages
 
 ---
 
-## License
+# 21. ECG Input Interface
 
-Apache 2.0 License
+The differential ECG input is provided through:
+
+```text
+INP
+INN
+```
+
+These inputs connect to the chopper-stabilized instrumentation amplifier.
+
+A differential architecture improves rejection of common-mode interference, which is especially important for low-amplitude biopotential signals.
+
+---
+
+# 22. Reference and Bias Interface
+
+Two externally accessible analog control pins are provided:
+
+```text
+VREF
+VBIAS
+```
+
+These provide reference and bias-trim capability for the analog circuitry.
+
+External accessibility is useful for:
+
+* Initial silicon characterization
+* Bias optimization
+* Operating-point adjustment
+* Testing
+* Debugging
+
+---
+
+# 23. Clock Interface
+
+The system uses an external clock:
+
+```text
+CLK
+```
+
+The clock supports timing requirements within the design.
+
+Using an external timing source avoids the additional area and design risk associated with incorporating a precision clock-generation block in the current revision.
+
+---
+
+# 24. Schematic Design
+
+All major circuit schematics have been completed.
+
+The schematic design includes:
+
+* Chopper-stabilized CCIA
+* OTA building blocks
+* Analog filtering stages
+* Differentiator
+* Squaring / nonlinear processing stage
+* Moving-window integrator
+* Threshold detector
+* Bias circuitry
+* Reference circuitry
+* Event-generation circuitry
+* R-R output circuitry
+* Top-level system integration
+
+### Status
+
+```text
+SCHEMATIC DESIGN: COMPLETE ✅
+```
+
+---
+
+# 25. Pre-Layout Simulation
+
+Pre-layout circuit simulations have been completed for the major circuit blocks and integrated signal chain.
+
+Verification included, where applicable:
+
+## DC Analysis
+
+Used to verify:
+
+* Bias currents
+* Device operating regions
+* Internal node voltages
+* Common-mode levels
+* Current consumption
+* Operating points
+
+---
+
+## AC Analysis
+
+Used to characterize:
+
+* Gain
+* Bandwidth
+* Filter frequency response
+* Frequency-domain behavior
+* Stability
+
+---
+
+## Transient Analysis
+
+Used to evaluate:
+
+* ECG signal propagation
+* CCIA operation
+* Filter response
+* Differentiator response
+* Nonlinear processing
+* Moving-window integration
+* Threshold detection
+* R-peak event detection
+* DET generation
+
+---
+
+## Integrated Simulation
+
+The full signal chain was integrated and simulated to verify propagation from the ECG input through the event-detection output.
+
+```text
+ECG
+ ↓
+CCIA
+ ↓
+Filter
+ ↓
+Differentiator
+ ↓
+Nonlinear Stage
+ ↓
+Moving Window Integration
+ ↓
+Threshold Detection
+ ↓
+DET
+```
+
+### Status
+
+```text
+PRE-LAYOUT SIMULATION: COMPLETE ✅
+```
+
+Detailed simulation results are maintained in:
+
+[**Schematic and Simulations — Google Slides**](https://docs.google.com/presentation/d/18qcQKhdBwNA_3tAG34yTULziVt0hrGmls-qpCYDhvls/edit?usp=sharing)
+
+---
+
+# 26. Physical Layout
+
+Physical layout of the complete design has been completed.
+
+The layout process included:
+
+* Device placement
+* Matched-device placement
+* Block-level routing
+* Analog routing
+* Bias routing
+* Reference routing
+* Power distribution
+* Sensitive-node routing
+* Block integration
+* Top-level placement
+* Top-level routing
+* Pin connectivity
+* Layout-rule cleanup
+
+Analog layout considerations included:
+
+* Device matching
+* Symmetry
+* Compact routing
+* Parasitic minimization
+* Sensitive-node isolation
+* Supply integrity
+* Bias integrity
+* Matching-critical routing
+
+### Status
+
+```text
+PHYSICAL LAYOUT: COMPLETE ✅
+```
+
+---
+
+# 27. Current Verification Stage — LVS
+
+The project is currently undergoing:
+
+## Layout Versus Schematic Verification
+
+```text
+LVS: IN PROGRESS 🔄
+```
+
+LVS verifies that the electrical circuit extracted from the physical layout matches the intended schematic.
+
+Conceptually:
+
+```text
+          Schematic
+              │
+              │ Netlist
+              ▼
+        ┌─────────────┐
+        │     LVS     │
+        │ Comparison  │
+        └─────────────┘
+              ▲
+              │ Extracted Netlist
+              │
+            Layout
+```
+
+The target is:
+
+```text
+SCHEMATIC ≡ LAYOUT
+
+        ↓
+
+    LVS CLEAN
+```
+
+Current LVS verification includes checking:
+
+* Transistor connectivity
+* Device dimensions
+* Source/drain connectivity
+* Bulk connections
+* Analog supply nets
+* Digital supply nets
+* Ground nets
+* Bias nets
+* Reference nets
+* Hierarchical connectivity
+* Top-level pin names
+* Missing devices
+* Extra extracted devices
+* Top-level connectivity
+
+---
+
+# 28. Parasitic Extraction
+
+Once LVS is clean, the next stage will be parasitic extraction.
+
+The extracted circuit will include effects such as:
+
+* Interconnect resistance
+* Interconnect capacitance
+* Coupling capacitance
+* Device parasitics
+* Additional routing-related loading
+
+These effects will then be incorporated into post-layout simulations.
+
+### Status
+
+```text
+PEX: PENDING ⬜
+```
+
+---
+
+# 29. Post-Layout Verification
+
+Post-layout simulations will determine how physical implementation affects circuit performance.
+
+Planned verification includes:
+
+* CCIA gain
+* CCIA bandwidth
+* Analog filter response
+* QRS-processing behavior
+* Threshold operation
+* DET generation
+* RR_OUT behavior
+* Full-chain transient response
+* Timing performance
+* Power consumption
+* Settling behavior
+
+### Status
+
+```text
+POST-LAYOUT VERIFICATION: PENDING ⬜
+```
+
+---
+
+# 30. Design Flow
+
+The project has progressed through:
+
+```text
+System Architecture
+       │
+       ▼
+Circuit Specifications
+       │
+       ▼
+Schematic Design
+       │
+       ▼
+Block-Level Simulation
+       │
+       ▼
+Top-Level Integration
+       │
+       ▼
+Top-Level Simulation
+       │
+       ▼
+Physical Layout
+       │
+       ▼
+      LVS
+       │
+       │  ← CURRENT STAGE
+       ▼
+Parasitic Extraction
+       │
+       ▼
+Post-Layout Simulation
+       │
+       ▼
+Final Verification
+       │
+       ▼
+Final GDS
+       │
+       ▼
+Chipathon Tapeout
+```
+
+---
+
+# 31. Progress Summary
+
+```text
+Architecture             ██████████ 100%  ✅
+Schematics               ██████████ 100%  ✅
+Block Simulations        ██████████ 100%  ✅
+Top-Level Integration    ██████████ 100%  ✅
+Top-Level Simulation     ██████████ 100%  ✅
+Physical Layout          ██████████ 100%  ✅
+LVS                      ███████░░░ Active 🔄
+PEX                      ░░░░░░░░░░ Pending
+Post-Layout Simulation   ░░░░░░░░░░ Pending
+Final GDS                ░░░░░░░░░░ Pending
+Tapeout                  ░░░░░░░░░░ Pending
+```
+
+---
+
+# 32. Design Tools
+
+The project uses an open-source analog/mixed-signal IC design flow.
+
+## Xschem
+
+Used for:
+
+* Schematic capture
+* Hierarchical circuit design
+* Testbench construction
+* Netlist generation
+
+---
+
+## ngspice
+
+Used for:
+
+* DC analysis
+* AC analysis
+* Transient analysis
+* Noise analysis
+* Device characterization
+* Block-level verification
+* Top-level verification
+
+---
+
+## KLayout
+
+Used for:
+
+* Physical layout
+* Layout inspection
+* Design-rule verification
+* LVS-related physical verification
+
+---
+
+## GF180MCU PDK
+
+Provides:
+
+* MOSFET models
+* Passive-device models
+* Layout layers
+* Design rules
+* Extraction rules
+* Process-specific verification support
+
+---
+
+## IIC-OSIC-TOOLS
+
+Used as the integrated open-source IC design environment for the project.
+
+---
+
+## Docker
+
+Used to provide a reproducible design environment across development systems.
+
+---
+
+## Git / GitHub
+
+Used for:
+
+* Version control
+* Team collaboration
+* Design tracking
+* Documentation
+* Chipathon submission management
+
+---
+
+# 33. Team
+
+## Biosignal Foundry — Team B08
+
+| Team Member                 | Primary Role                                          |
+| --------------------------- | ----------------------------------------------------- |
+| **Surya Varchasvi Devaraj** | Team Lead, System Architecture, Top-Level Integration |
+| **Wenxin Zeng**             | CCIA / Instrumentation Amplifier                      |
+| **Leah Berube**             | OTA Design                                            |
+| **Fayruj Fathima**          | QRS Feature Extraction Engine                         |
+| **Yutong Wu**               | Bias and Reference Generation                         |
+
+The final system integrates the independently developed analog and mixed-signal blocks into a single event-driven ECG-processing SoC.
+
+---
+
+# 34. Development Timeline
+
+| Stage                    | Status      |
+| ------------------------ | ----------- |
+| Architecture definition  | ✅ Completed |
+| Architecture freeze      | ✅ Completed |
+| Schematic development    | ✅ Completed |
+| Block simulations        | ✅ Completed |
+| System integration       | ✅ Completed |
+| Top-level simulation     | ✅ Completed |
+| Block layouts            | ✅ Completed |
+| Top-level layout         | ✅ Completed |
+| LVS                      | 🔄 Current  |
+| PEX                      | ⬜ Next      |
+| Post-layout verification | ⬜ Pending   |
+| Final GDS                | ⬜ Pending   |
+| Tapeout                  | ⬜ Pending   |
+
+Detailed task-level tracking is maintained in:
+
+[**B08 Chipathon Progress Tracker — Google Sheets**](https://docs.google.com/spreadsheets/d/1Dva5xNq5iXcITRApbbd2DMtIVU4WqZdsdKf1LQmGMNk/edit?usp=sharing)
+
+---
+
+# 35. Intended Applications
+
+The event-driven ECG architecture targets applications in which cardiac timing information can provide useful physiological information without continuously digitizing the complete ECG waveform.
+
+Potential applications include:
+
+* Wearable ECG monitoring
+* Implantable cardiac sensing
+* Long-term ambulatory monitoring
+* Heart-rate monitoring
+* Heart-rate-variability monitoring
+* Physiological stress monitoring
+* Compact biomedical sensing
+* Battery-constrained health-monitoring systems
+* Event-driven biomedical sensor nodes
+
+---
+
+# 36. Advantages of the Architecture
+
+The primary advantages of the proposed architecture include:
+
+### Reduced Continuous Digitization
+
+Critical cardiac features are extracted before conventional full-waveform digitization.
+
+### Event-Driven Operation
+
+The chip generates cardiac events rather than a continuous stream of digitized ECG samples.
+
+### Reduced Data Bandwidth
+
+Heartbeat timing information requires significantly less output data than continuous ECG waveform transmission.
+
+### Analog Feature Extraction
+
+QRS-processing stages are directly implemented using integrated analog circuitry.
+
+### Compact Digital Interface
+
+The primary digital outputs are:
+
+```text
+DET
+RR_OUT
+```
+
+### Flexible Characterization
+
+External access to:
+
+```text
+VREF
+VBIAS
+CLK
+DET
+RR_OUT
+```
+
+provides flexibility during post-fabrication testing and characterization.
+
+---
+
+# 37. Future Extensions
+
+Potential future work includes:
+
+* Silicon characterization
+* PCB-based testing
+* ECG electrode integration
+* Human ECG acquisition
+* ECG database validation
+* Adaptive threshold optimization
+* Improved arrhythmia detection
+* Integrated low-power ADC
+* Optional raw ECG waveform output
+* Integrated oscillator
+* Wireless cardiac-event transmission
+* Closed-loop biomedical sensing
+* Fully integrated wearable ECG systems
+
+A future revision could support both:
+
+```text
+                ┌────► DET / R-Peak Events
+                │
+ECG ─► AFE ─────┤
+                │
+                └────► Raw ECG ADC
+```
+
+allowing event-driven detection and full-waveform ECG acquisition to coexist.
+
+---
+
+# 38. IEEE SSCS Chipathon 2026
+
+This project is being developed as part of the:
+
+## IEEE Solid-State Circuits Society Chipathon 2026
+
+### Team
+
+**B08 — Biosignal Foundry**
+
+### Track
+
+**Track B — Circuits for Sensors**
+
+### Technology
+
+**GlobalFoundries GF180MCU 180 nm**
+
+### Current Tapeout Stage
+
+```text
+Schematics  ✅
+    ↓
+Simulations ✅
+    ↓
+Layout      ✅
+    ↓
+LVS         🔄
+    ↓
+PEX         ⬜
+    ↓
+Post-Layout ⬜
+    ↓
+Tapeout     ⬜
+```
+
+The official project registration and original proposal are available here:
+
+[**IEEE SSCS Chipathon 2026 — Biosignal Foundry Issue #63**](https://github.com/sscs-ose/sscs-chipathon-2026/issues/63)
+
+---
+
+# 39. Project Resources Summary
+
+| Resource                                                                                                                            | Purpose                                                              |
+| ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| [**Schematic & Simulations**](https://docs.google.com/presentation/d/18qcQKhdBwNA_3tAG34yTULziVt0hrGmls-qpCYDhvls/edit?usp=sharing) | Schematics, simulation results, design evolution, and design reviews |
+| [**Progress Tracker**](https://docs.google.com/spreadsheets/d/1Dva5xNq5iXcITRApbbd2DMtIVU4WqZdsdKf1LQmGMNk/edit?usp=sharing)        | Task ownership, project progress, and milestone tracking             |
+| [**Pin Assignment**](https://docs.google.com/spreadsheets/d/1QQbtaFOqn0G63YKYgDVndsNMXKOrIu-xAYuyjMj1dco/edit?gid=0#gid=0)          | Current analog, digital, power, and I/O allocation                   |
+| [**Chipathon Issue #63**](https://github.com/sscs-ose/sscs-chipathon-2026/issues/63)                                                | Official Team B08 registration and original project proposal         |
+| **Original Chipathon Proposal**                                                                                                     | Attached to Chipathon Issue #63                                      |
+
+---
+
+# 40. Current Tapeout Checklist
+
+### Circuit Design
+
+* [x] Architecture defined
+* [x] Specifications established
+* [x] CCIA schematic completed
+* [x] OTA schematic completed
+* [x] Analog filters completed
+* [x] QRS-processing circuits completed
+* [x] Bias/reference circuits completed
+* [x] Top-level schematic completed
+
+### Simulation
+
+* [x] Block-level simulations completed
+* [x] Top-level simulations completed
+* [x] ECG signal-chain operation verified
+
+### Physical Design
+
+* [x] Block-level layouts completed
+* [x] Top-level layout completed
+* [x] Power and signal routing completed
+* [x] Pin interface implemented
+
+### Verification
+
+* [ ] LVS clean
+* [ ] Parasitic extraction
+* [ ] Post-layout simulations
+* [ ] Final verification
+
+### Tapeout
+
+* [ ] Final GDS
+* [ ] Final reports
+* [ ] Submission package
+* [ ] Chipathon tapeout submission
+
+---
+
+# 41. License
+
+This project is released under the:
+
+## Apache License 2.0
+
+See the repository license file for additional information.
+
+---
+
+# Biosignal Foundry — Chipathon 2026
+
+## Analog ECG In → Cardiac Events Out
+
+Biosignal Foundry explores an event-driven approach to ultra-low-power cardiac sensing by moving critical ECG feature-extraction operations into the analog domain.
+
+Rather than relying exclusively on continuous full-waveform digitization, the architecture extracts cardiac events directly on-chip and exposes both **R-peak detection (`DET`)** and **R-R interval data (`RR_OUT`)**.
+
+### Current Status
+
+**Schematics ✅ | Simulations ✅ | Layout ✅ | LVS 🔄**
+
+**Next milestone: LVS clean → PEX → Post-layout verification → Tapeout**
