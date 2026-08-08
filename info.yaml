@@ -3,17 +3,12 @@
 # LICENSE: Apache License Version 2.0
 # http://www.apache.org/licenses/
 # ----- ------ ----- ----- ------ ----- ----- ------ -----
-
 # data will be pulled from main branch of the repo.
 # please be sure that the main branch contains the data you want to submit.
 
-# ======================================================
-# Project metadata (used for documentation / review)
-# ======================================================
-
 project:
   title: "Ultra-Low-Power Event-Driven ECG Sensor SoC with Analog R-Peak Detection"
-  team: "Biosignal Foundry"
+  team: "B08 Biosignal Foundry"
   discord: ""
-  description: "Ultra-low-power GF180MCU ECG sensor SoC using analog QRS feature extraction and event-driven R-peak detection for heart-rate and HRV monitoring."
-  lvs_config: "<relative-path-to-lvs_config.json>"
+  description: "GF180MCU CCIA dry-run submission for the Biosignal Foundry event-driven ECG sensor SoC."
+  lvs_config: "https://github.com/Varchaswin/Biosignal-Foundry/blob/main/lvs_config.json"
