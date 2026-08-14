@@ -11,4 +11,4 @@ project:
   team: "B08 Biosignal Foundry"
   discord: ""
   description: "GF180MCU CCIA dry-run submission for the Biosignal Foundry event-driven ECG sensor SoC."
-  lvs_config: "https://github.com/Varchaswin/Biosignal-Foundry/blob/main/lvs_config.json"
+  lvs_config: "lvs_config.json"
