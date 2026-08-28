@@ -1,0 +1,383 @@
+** sch_path: /foss/designs/TOP.sch
+.subckt TOP VDD VSS electrode_p electrode_n CLK START VDET VREF VBIAS VTRIM INA_OUT
+*.PININFO VDD:B VSS:B electrode_p:B electrode_n:B CLK:B START:B VDET:B VREF:B VBIAS:B VTRIM:B INA_OUT:B
+x1 VDD VSS electrode_p electrode_n INA_OUT VTRIM REF VBIAS VBIAS Phi1 Phi1b Phi2 Phi2b CCIA_chopped
+XBPF1 SINGLE_OUT VREF VBIAS VBIAS VDD VSS BPF gf180_ecg_bpf
+x2 CLK Phi1 Phi1b Phi2 Phi2b VDD VSS gf180_nonoverlap_clkgen
+x3 INA_OUT VTRIM VREF SINGLE_OUT VBIAS VDD VSS gf180_diff2se_gain R1=1Meg R2=2Meg
+XDIFF1 BPF VREF VBIAS VDD VSS DIFF gf180_ecg_differentiator
+XSQT1 DIFF DIFF VREF VREF VDD VSS INT gf180_ecg_squarer_transistor
+XINT1 INT VREF VBIAS VBIAS VDD VSS gf180_ecg_integrator
+XTH1 INT REF VBIAS VDD VSS VDET gf180_ecg_threshold
+XBGR START REF VDD VSS gf180_banba_bgr
+.ends
+
+* expanding   symbol:  CCIA_chopped.sym # of pins=13
+** sym_path: /foss/designs/CCIA_chopped.sym
+** sch_path: /foss/designs/CCIA_chopped.sch
+.subckt CCIA_chopped vdd vss electrode_p electrode_n vout_bb_p vout_bb_n vocm_set i_bias v_bias_cmfb Phi1 Phi1b Phi2 Phi2b
+*.PININFO vdd:B vss:B electrode_p:B electrode_n:B vout_bb_p:B vout_bb_n:B vocm_set:B i_bias:B v_bias_cmfb:B Phi1:B Phi1b:B Phi2:B
+*+ Phi2b:B
+xCCIA vdd vss net1 net2 net3 net4 vocm_set i_bias v_bias_cmfb CCIA
+xCH_In vdd vss net2 net1 electrode_p electrode_n Phi1 Phi2 Phi1b Phi2b Chopper
+xCH_Out vdd vss vout_bb_n vout_bb_p net3 net4 Phi1 Phi2 Phi1b Phi2b Chopper
+xCh_pf vdd vss net6 net5 vout_bb_p vout_bb_n Phi1 Phi2 Phi1b Phi2b Chopper
+XCpf_p net1 net5 cap_mim_2f0fF c_width=5e-6 c_length=10e-6
+XCpf_n net2 net6 cap_mim_2f0fF c_width=5e-6 c_length=10e-6
+.ends
+
+
+* expanding   symbol:  gf180_ecg_bpf.sym # of pins=7
+** sym_path: /foss/designs/gf180_ecg_bpf.sym
+** sch_path: /foss/designs/gf180_ecg_bpf.sch
+.subckt gf180_ecg_bpf VIN VREF VBIAS_HP VBIAS_LP VDD VSS VOUT
+*.PININFO VIN:I VREF:I VBIAS_HP:I VBIAS_LP:I VDD:B VSS:B VOUT:O
+X1GM1 VDD VSS net1 VREF VBIAS_HP net1 gf180_9T_bpf_1
+X2GM2 VDD VSS VOUT net1 VBIAS_LP VOUT gf180_9T_bpf_2
+XC3 net1 VIN cap_mim_2f0fF c_width=50e-6 c_length=100e-6
+XC1 VOUT VSS cap_mim_2f0fF c_width=50e-6 c_length=100e-6
+.ends
+
+
+* expanding   symbol:  gf180_nonoverlap_clkgen.sym # of pins=7
+** sym_path: /foss/designs/gf180_nonoverlap_clkgen.sym
+** sch_path: /foss/designs/gf180_nonoverlap_clkgen.sch
+.subckt gf180_nonoverlap_clkgen CLK Phi1 Phi1b Phi2 Phi2b VDD VSS
+*.PININFO CLK:I VDD:B VSS:B Phi1:O Phi1b:O Phi2:O Phi2b:O
+XCLKB CLK CLKB VDD VSS gf180_clk_inv_1 L=0.28u WN=0.42u WP=0.84u
+XD1A CLK D1N VDD VSS gf180_clk_inv_1 L=10u WN=0.42u WP=0.84u
+XD1B D1N CLKD VDD VSS gf180_clk_inv_1 L=10u WN=0.42u WP=0.84u
+XD2A CLKB D2N VDD VSS gf180_clk_inv_1 L=10u WN=0.42u WP=0.84u
+XD2B D2N CLKBD VDD VSS gf180_clk_inv_1 L=10u WN=0.42u WP=0.84u
+XNAND1 CLK CLKD P1N VDD VSS gf180_clk_nand2 L=0.28u WN=0.84u WP=0.84u
+XNAND2 CLKB CLKBD P2N VDD VSS gf180_clk_nand2 L=0.28u WN=0.84u WP=0.84u
+XBUF1 P1N Phi1 VDD VSS gf180_clk_inv_2 L=0.28u WN=0.84u WP=1.68u
+XCOMP1 Phi1 Phi1b VDD VSS gf180_clk_inv_2 L=0.28u WN=0.84u WP=1.68u
+XBUF2 P2N Phi2 VDD VSS gf180_clk_inv_2 L=0.28u WN=0.84u WP=1.68u
+XCOMP2 Phi2 Phi2b VDD VSS gf180_clk_inv_2 L=0.28u WN=0.84u WP=1.68u
+.ends
+
+
+* expanding   symbol:  gf180_diff2se_gain.sym # of pins=7
+** sym_path: /foss/designs/gf180_diff2se_gain.sym
+** sch_path: /foss/designs/gf180_diff2se_gain.sch
+.subckt gf180_diff2se_gain VINP VINN VREF VOUT VBIAS VDD VSS  R1=1Meg R2=2Meg
+*.PININFO VINP:I VINN:I VREF:I VBIAS:I VDD:B VSS:B VOUT:O
+X1OTA VP VN VOUT VBIAS VDD VSS gf180_diff2se_ota WTAIL=0.9u LTAIL=7.25u WIN=1.2u LIN=2u WMIR=0.6u LMIR=1.2u CCOMP=1p
+XR1P VINP VP VSS ppolyf_u_1k r_width=1e-6 r_length=100e-6
+XR2P VREF VP VSS ppolyf_u_1k r_width=1e-6 r_length=200e-6
+XR1N VINN VN VSS ppolyf_u_1k r_width=1e-6 r_length=100e-6
+XR2N VOUT VN VSS ppolyf_u_1k r_width=1e-6 r_length=200e-6
+.ends
+
+
+* expanding   symbol:  gf180_ecg_differentiator.sym # of pins=6
+** sym_path: /foss/designs/gf180_ecg_differentiator.sym
+** sch_path: /foss/designs/gf180_ecg_differentiator.sch
+.subckt gf180_ecg_differentiator VIN VREF VBIAS_DIFF VDD VSS VOUT
+*.PININFO VIN:I VREF:I VBIAS_DIFF:I VDD:B VSS:B VOUT:O
+X1GM3 VDD VSS VOUT VREF VBIAS_DIFF VOUT gf180_9T_differentiator
+XC1 VOUT VIN cap_mim_2f0fF c_width=50e-6 c_length=100e-6
+.ends
+
+
+* expanding   symbol:  gf180_ecg_squarer_transistor.sym # of pins=7
+** sym_path: /foss/designs/gf180_ecg_squarer_transistor.sym
+** sch_path: /foss/designs/gf180_ecg_squarer_transistor.sch
+.subckt gf180_ecg_squarer_transistor INEG IPOS VSQB1 VSQB2 VDD VSS IOUT
+*.PININFO VDD:B VSS:B INEG:I IPOS:I VSQB1:I VSQB2:I IOUT:O
+MN2 INEG INEG net1 VSS nfet_03v3 L=2u W=0.4u nf=1
+MN1 net1 net1 VSS VSS nfet_03v3 L=2u W=0.4u nf=1
+MN3 VDD INEG net2 VSS nfet_03v3 L=2u W=0.4u nf=1
+MN4 net2 VSQB1 VSS VSS nfet_03v3 L=2u W=0.4u nf=1
+MN5 net3 net2 VSS VSS nfet_03v3 L=2u W=0.4u nf=1
+MP1 net4 net4 VDD VDD pfet_03v3 L=2u W=0.8u nf=1
+MP2 IPOS IPOS net4 VDD pfet_03v3 L=2u W=0.8u nf=1
+MP4 net5 VSQB2 VDD VDD pfet_03v3 L=2u W=0.8u nf=1
+MP3 VSS IPOS net5 VDD pfet_03v3 L=2u W=0.8u nf=1
+MP5 net7 net5 VDD VDD pfet_03v3 L=2u W=0.8u nf=1
+MP6 net3 net3 VDD VDD pfet_03v3 L=2u W=0.8u nf=1
+MP7 net6 net3 VDD VDD pfet_03v3 L=2u W=0.8u nf=1
+MN6 net6 net6 VSS VSS nfet_03v3 L=2u W=0.4u nf=1
+MN7 IOUT net6 VSS VSS nfet_03v3 L=2u W=0.4u nf=1
+MN8 net7 net7 net8 VSS nfet_03v3 L=2u W=0.4u nf=1
+MN9 IOUT net7 net9 VSS nfet_03v3 L=2u W=0.4u nf=1
+MN10 net8 net8 VSS VSS nfet_03v3 L=2u W=0.4u nf=1
+MN11 net9 net8 VSS VSS nfet_03v3 L=2u W=0.4u nf=1
+.ends
+
+
+* expanding   symbol:  gf180_ecg_integrator.sym # of pins=6
+** sym_path: /foss/designs/gf180_ecg_integrator.sym
+** sch_path: /foss/designs/gf180_ecg_integrator.sch
+.subckt gf180_ecg_integrator VINT VREF VBIAS_INT VBASE VDD VSS
+*.PININFO VINT:B VREF:I VBIAS_INT:I VBASE:I VDD:B VSS:B
+X1GM4 VDD VSS VINT VREF VBIAS_INT VINT gf180_9T_integrator
+MSUB VINT VBASE VSS VSS nfet_03v3 L=2u W=0.4u nf=1
+XC1 VINT VSS cap_mim_2f0fF c_width=29.2e-6 c_length=10e-6
+.ends
+
+
+* expanding   symbol:  gf180_ecg_threshold.sym # of pins=6
+** sym_path: /foss/designs/gf180_ecg_threshold.sym
+** sch_path: /foss/designs/gf180_ecg_threshold.sch
+.subckt gf180_ecg_threshold VINT VTH VBIAS_CMP VDD VSS VDET
+*.PININFO VINT:I VTH:I VBIAS_CMP:I VDD:B VSS:B VDET:O
+XCMP VDD VSS VINT VTH VBIAS_CMP net1 gf180_9T_threshold
+MPINV VDET net1 VDD VDD pfet_03v3 L=0.8u W=0.8u nf=1
+MNINV VDET net1 VSS VSS nfet_03v3 L=0.8u W=0.4u nf=1
+.ends
+
+
+* expanding   symbol:  gf180_banba_bgr.sym # of pins=4
+** sym_path: /foss/designs/gf180_banba_bgr.sym
+** sch_path: /foss/designs/gf180_banba_bgr.sch
+.subckt gf180_banba_bgr START VREF VDD VSS
+*.PININFO VDD:B VSS:B VREF:O START:I
+MP1 V1 VG VDD VDD pfet_03v3 L=2u W=8u nf=2
+MP2 V2 VG VDD VDD pfet_03v3 L=2u W=8u nf=2
+MP3 VREF VG VDD VDD pfet_03v3 L=2u W=8u nf=2
+MP4 NBIAS VG VDD VDD pfet_03v3 L=2u W=8u nf=2
+XQ1 VSS VSS V1 pnp_05p00x00p42
+XQ2 VSS VSS VE2 pnp_05p00x00p42 m=16
+MPA NLOAD NLOAD VDD VDD pfet_03v3 L=2u W=20u nf=2
+MPB VG NLOAD VDD VDD pfet_03v3 L=2u W=20u nf=2
+MN1 NLOAD V2 NTAIL VSS nfet_03v3 L=2u W=10u nf=2
+MN2 VG V1 NTAIL VSS nfet_03v3 L=2u W=10u nf=2
+MNBIAS NBIAS NBIAS VSS VSS nfet_03v3 L=2u W=5u nf=1
+MNTAIL NTAIL NTAIL VSS VSS nfet_03v3 L=2u W=1u nf=1
+MNSTART VG START VSS VSS nfet_03v3 L=0.8u W=2u nf=1
+XCLOOP VG VSS cap_mim_2f0fF c_width=50e-6 c_length=100e-6
+XCREF VREF VSS cap_mim_2f0fF c_width=50e-6 c_length=100e-6
+XRSH1 VSS V1 VSS ppolyf_u_1k r_width=1e-6 r_length=800u
+XRSH2 VSS V2 VSS ppolyf_u_1k r_width=1e-6 r_length=800u
+XROUT VSS VREF VSS ppolyf_u_1k r_width=1e-6 r_length=800u
+XRPTAT VE2 V2 VSS ppolyf_u_1k r_width=1e-6 r_length=114u
+.ends
+
+
+* expanding   symbol:  CCIA.sym # of pins=9
+** sym_path: /foss/designs/CCIA.sym
+** sch_path: /foss/designs/CCIA.sch
+.subckt CCIA vdd vss vin_p vin_n vout_p vout_n vocm_set i_bias v_bias_cmfb
+*.PININFO vdd:B vss:B vin_p:B vin_n:B vout_p:B vout_n:B vocm_set:B i_bias:B v_bias_cmfb:B
+xOTA vdd vss ota_in_p ota_in_n vout_p vout_n vcmfb i_bias OTA
+xCMFB vdd vss vout_p vout_n vocm_set v_bias_cmfb vcmfb CMFB
+MPSEUDO_N_L pr_n_mid pr_n_mid ota_in_n ota_in_n pfet_03v3 L=2u W=0.42u nf=1
+MPSEUDO_N_R pr_n_mid pr_n_mid vout_n vout_n pfet_03v3 L=2u W=0.42u nf=1
+MPSEUDO_P_L pr_p_mid pr_p_mid ota_in_p ota_in_p pfet_03v3 L=2u W=0.42u nf=1
+MPSEUDO_P_R pr_p_mid pr_p_mid vout_p vout_p pfet_03v3 L=2u W=0.42u nf=1
+XCFB_P vout_n ota_in_p cap_mim_2f0fF c_width=10e-6 c_length=5e-6
+XCFB_N vout_p ota_in_n cap_mim_2f0fF c_width=10e-6 c_length=5e-6
+XCIN_P vin_p ota_in_p cap_mim_2f0fF c_width=25e-6 c_length=100e-6
+XCIN_N ota_in_n vin_n cap_mim_2f0fF c_width=25e-6 c_length=100e-6
+.ends
+
+
+* expanding   symbol:  Chopper.sym # of pins=10
+** sym_path: /foss/designs/Chopper.sym
+** sch_path: /foss/designs/Chopper.sch
+.subckt Chopper VDD GND Vx- Vx+ In+ In- Ph1 Ph2 Ph1b Ph2b
+*.PININFO Vx+:O In+:I VDD:B Ph1:I Ph2:I GND:B Vx-:O In-:I Ph1b:I Ph2b:I
+xTG_P1 Ph1 GND In+ Vx+ VDD Ph1b TG
+xTG_N1 Ph2 GND In+ Vx- VDD Ph2b TG
+xTG_P2 Ph1 GND In- Vx- VDD Ph1b TG
+xTG_N2 Ph2 GND In- Vx+ VDD Ph2b TG
+.ends
+
+
+* expanding   symbol:  gf180_9T_bpf_1.sym # of pins=6
+** sym_path: /foss/designs/gf180_9T_bpf_1.sym
+** sch_path: /foss/designs/gf180_9T_bpf_1.sch
+.subckt gf180_9T_bpf_1 VDD VSS VINP VINN VBIAS IOUT
+*.PININFO VDD:B VSS:B VINP:I VINN:I VBIAS:I IOUT:O
+M1 net2 VINP net1 VDD pfet_03v3 L=2u W=1.2u nf=1
+M2 net3 VINN net1 VDD pfet_03v3 L=2u W=1.2u nf=1
+MB net1 VBIAS VDD VDD pfet_03v3 L=6.5u W=0.9u nf=1
+M3 net2 net2 VSS VSS nfet_03v3 L=1.2u W=0.6u nf=1
+M4 net3 net3 VSS VSS nfet_03v3 L=1.2u W=0.6u nf=1
+M7 net4 net4 VDD VDD pfet_03v3 L=1.2u W=0.8u nf=1
+M5 net4 net2 VSS VSS nfet_03v3 L=1.2u W=0.8u nf=1
+M8 IOUT net4 VDD VDD pfet_03v3 L=1.2u W=0.8u nf=1
+M6 IOUT net3 VSS VSS nfet_03v3 L=1.2u W=0.8u nf=1
+.ends
+
+
+* expanding   symbol:  gf180_9T_bpf_2.sym # of pins=6
+** sym_path: /foss/designs/gf180_9T_bpf_2.sym
+** sch_path: /foss/designs/gf180_9T_bpf_2.sch
+.subckt gf180_9T_bpf_2 VDD VSS VINP VINN VBIAS IOUT
+*.PININFO VDD:B VSS:B VINP:I VINN:I VBIAS:I IOUT:O
+M1 net2 VINP net1 VDD pfet_03v3 L=2u W=1.2u nf=1
+M2 net3 VINN net1 VDD pfet_03v3 L=2u W=1.2u nf=1
+MB net1 VBIAS VDD VDD pfet_03v3 L=9u W=0.22u nf=1
+M3 net2 net2 VSS VSS nfet_03v3 L=1.2u W=0.6u nf=1
+M4 net3 net3 VSS VSS nfet_03v3 L=1.2u W=0.6u nf=1
+M7 net4 net4 VDD VDD pfet_03v3 L=1.2u W=0.8u nf=1
+M5 net4 net2 VSS VSS nfet_03v3 L=1.2u W=0.8u nf=1
+M8 IOUT net4 VDD VDD pfet_03v3 L=1.2u W=0.8u nf=1
+M6 IOUT net3 VSS VSS nfet_03v3 L=1.2u W=0.8u nf=1
+.ends
+
+
+* expanding   symbol:  gf180_clk_inv_1.sym # of pins=4
+** sym_path: /foss/designs/gf180_clk_inv_1.sym
+** sch_path: /foss/designs/gf180_clk_inv_1.sch
+.subckt gf180_clk_inv_1 IN OUT VDD VSS  L=0.28u WN=0.42u WP=0.84u
+*.PININFO IN:I VDD:B VSS:B OUT:O
+MP OUT IN VDD VDD pfet_03v3 L=0.28u W=0.84u nf=1
+MN OUT IN VSS VSS nfet_03v3 L=0.28u W=0.42u nf=1
+.ends
+
+
+* expanding   symbol:  gf180_clk_nand2.sym # of pins=5
+** sym_path: /foss/designs/gf180_clk_nand2.sym
+** sch_path: /foss/designs/gf180_clk_nand2.sch
+.subckt gf180_clk_nand2 A B Y VDD VSS  L=0.28u WN=0.84u WP=0.84u
+*.PININFO A:I B:I Y:O VDD:B VSS:B
+MPA Y A VDD VDD pfet_03v3 L=0.28u W=0.84u nf=1
+MPB Y B VDD VDD pfet_03v3 L=0.28u W=0.84u nf=1
+MNA Y A NSTACK VSS nfet_03v3 L=0.28u W=0.84u nf=1
+MNB NSTACK B VSS VSS nfet_03v3 L=0.28u W=0.84u nf=1
+.ends
+
+
+* expanding   symbol:  gf180_clk_inv_2.sym # of pins=4
+** sym_path: /foss/designs/gf180_clk_inv_2.sym
+** sch_path: /foss/designs/gf180_clk_inv_2.sch
+.subckt gf180_clk_inv_2 IN OUT VDD VSS  L=0.28u WN=0.42u WP=0.84u
+*.PININFO IN:I VDD:B VSS:B OUT:O
+MP OUT IN VDD VDD pfet_03v3 L=0.28u W=1.68u nf=1
+MN OUT IN VSS VSS nfet_03v3 L=0.28u W=0.84u nf=1
+.ends
+
+
+* expanding   symbol:  gf180_diff2se_ota.sym # of pins=6
+** sym_path: /foss/designs/gf180_diff2se_ota.sym
+** sch_path: /foss/designs/gf180_diff2se_ota.sch
+.subckt gf180_diff2se_ota VINP VINN VOUT VBIAS VDD VSS  WTAIL=0.9u LTAIL=7.25u WIN=1.2u LIN=2u WMIR=0.6u LMIR=1.2u CCOMP=1p
+*.PININFO VINP:I VINN:I VBIAS:I VDD:B VSS:B VOUT:O
+MTAIL TAIL VBIAS VDD VDD pfet_03v3 L=LTAIL W=WTAIL nf=1
+MP1 NREF VINP TAIL VDD pfet_03v3 L=LIN W=WIN nf=1
+MP2 VOUT VINN TAIL VDD pfet_03v3 L=LIN W=WIN nf=1
+MN1 NREF NREF VSS VSS nfet_03v3 L=LMIR W=WMIR nf=1
+MN2 VOUT NREF VSS VSS nfet_03v3 L=LMIR W=WMIR nf=1
+.ends
+
+
+* expanding   symbol:  gf180_9T_differentiator.sym # of pins=6
+** sym_path: /foss/designs/gf180_9T_differentiator.sym
+** sch_path: /foss/designs/gf180_9T_differentiator.sch
+.subckt gf180_9T_differentiator VDD VSS VINP VINN VBIAS IOUT
+*.PININFO VDD:B VSS:B VINP:I VINN:I VBIAS:I IOUT:O
+M1 net2 VINP net1 VDD pfet_03v3 L=2u W=1.2u nf=1
+M2 net3 VINN net1 VDD pfet_03v3 L=2u W=1.2u nf=1
+MB net1 VBIAS VDD VDD pfet_03v3 L=7.1u W=0.25u nf=1
+M3 net2 net2 VSS VSS nfet_03v3 L=1.2u W=0.6u nf=1
+M4 net3 net3 VSS VSS nfet_03v3 L=1.2u W=0.6u nf=1
+M7 net4 net4 VDD VDD pfet_03v3 L=1.2u W=0.8u nf=1
+M5 net4 net2 VSS VSS nfet_03v3 L=1.2u W=0.8u nf=1
+M8 IOUT net4 VDD VDD pfet_03v3 L=1.2u W=0.8u nf=1
+M6 IOUT net3 VSS VSS nfet_03v3 L=1.2u W=0.8u nf=1
+.ends
+
+
+* expanding   symbol:  gf180_9T_integrator.sym # of pins=6
+** sym_path: /foss/designs/gf180_9T_integrator.sym
+** sch_path: /foss/designs/gf180_9T_integrator.sch
+.subckt gf180_9T_integrator VDD VSS VINP VINN VBIAS IOUT
+*.PININFO VDD:B VSS:B VINP:I VINN:I VBIAS:I IOUT:O
+M1 net2 VINP net1 VDD pfet_03v3 L=2u W=1.2u nf=1
+M2 net3 VINN net1 VDD pfet_03v3 L=2u W=1.2u nf=1
+MB net1 VBIAS VDD VDD pfet_03v3 L=27.8u W=0.44u nf=1
+M3 net2 net2 VSS VSS nfet_03v3 L=1.2u W=0.6u nf=1
+M4 net3 net3 VSS VSS nfet_03v3 L=1.2u W=0.6u nf=1
+M7 net4 net4 VDD VDD pfet_03v3 L=1.2u W=0.8u nf=1
+M5 net4 net2 VSS VSS nfet_03v3 L=1.2u W=0.8u nf=1
+M8 IOUT net4 VDD VDD pfet_03v3 L=1.2u W=0.8u nf=1
+M6 IOUT net3 VSS VSS nfet_03v3 L=1.2u W=0.8u nf=1
+.ends
+
+
+* expanding   symbol:  gf180_9T_threshold.sym # of pins=6
+** sym_path: /foss/designs/gf180_9T_threshold.sym
+** sch_path: /foss/designs/gf180_9T_threshold.sch
+.subckt gf180_9T_threshold VDD VSS VINP VINN VBIAS IOUT
+*.PININFO VDD:B VSS:B VINP:I VINN:I VBIAS:I IOUT:O
+M1 net2 VINP net1 VDD pfet_03v3 L=2u W=1.2u nf=1
+M2 net3 VINN net1 VDD pfet_03v3 L=2u W=1.2u nf=1
+MB net1 VBIAS VDD VDD pfet_03v3 L=7.25u W=0.9u nf=1
+M3 net2 net2 VSS VSS nfet_03v3 L=1.2u W=0.6u nf=1
+M4 net3 net3 VSS VSS nfet_03v3 L=1.2u W=0.6u nf=1
+M7 net4 net4 VDD VDD pfet_03v3 L=1.2u W=0.8u nf=1
+M5 net4 net2 VSS VSS nfet_03v3 L=1.2u W=0.8u nf=1
+M8 IOUT net4 VDD VDD pfet_03v3 L=1.2u W=0.8u nf=1
+M6 IOUT net3 VSS VSS nfet_03v3 L=1.2u W=0.8u nf=1
+.ends
+
+
+* expanding   symbol:  OTA.sym # of pins=8
+** sym_path: /foss/designs/OTA.sym
+** sch_path: /foss/designs/OTA.sch
+.subckt OTA vdd vss vin_p vin_n vout_p vout_n vcmfb i_bias
+*.PININFO vdd:B vss:B vin_p:B vin_n:B vout_p:B vout_n:B vcmfb:B i_bias:B
+x2 vin_p vin_n net2 net1 vdd vss i_bias vcmfb input_stage
+x1 vdd vss net2 net1 vout_p vout_n i_bias output_stage
+.ends
+
+
+* expanding   symbol:  CMFB.sym # of pins=7
+** sym_path: /foss/designs/CMFB.sym
+** sch_path: /foss/designs/CMFB.sch
+.subckt CMFB vdd vss OTAout_p OTAout_n vocm_set i_bias vcmfb
+*.PININFO vdd:B vss:B OTAout_p:B OTAout_n:B vocm_set:B i_bias:B vcmfb:B
+MTAIL cmfb_tail i_bias vdd vdd pfet_03v3 L=2u W=1u nf=1
+MP_REF cmfb_ref vocm_set cmfb_tail vdd pfet_03v3 L=2u W=1u nf=1
+MP_SENSE vcmfb vocm_sense cmfb_tail vdd pfet_03v3 L=2u W=1u nf=1
+MN_DIODE cmfb_ref cmfb_ref vss vss nfet_03v3 L=4u W=1u nf=1
+MN_OUT vcmfb cmfb_ref vss vss nfet_03v3 L=4u W=1u nf=1
+XC1 net1 vss cap_mim_2f0fF c_width=25e-6 c_length=20e-6
+XRVP vocm_sense OTAout_p vss ppolyf_u_1k r_width=1e-6 r_length=200e-6
+XRVN vocm_sense OTAout_n vss ppolyf_u_1k r_width=1e-6 r_length=200e-6
+XR1 net1 vcmfb vss ppolyf_u_1k r_width=1e-6 r_length=50e-6
+.ends
+
+
+* expanding   symbol:  TG.sym # of pins=6
+** sym_path: /foss/designs/TG.sym
+** sch_path: /foss/designs/TG.sch
+.subckt TG En GND In Out VDD EnB
+*.PININFO En:I EnB:I GND:B In:B Out:B VDD:B
+MN In En Out GND nfet_03v3 L=0.28u W=0.42u nf=1
+MP Out EnB In VDD pfet_03v3 L=0.28u W=0.84u nf=1
+MN1 Out EnB Out GND nfet_03v3 L=0.28u W=0.42u nf=1
+MP1 Out En Out VDD pfet_03v3 L=0.28u W=0.84u nf=1
+.ends
+
+
+* expanding   symbol:  OTA/input_stage/input_stage.sym # of pins=8
+** sym_path: /foss/designs/OTA/input_stage/input_stage.sym
+** sch_path: /foss/designs/OTA/input_stage/input_stage.sch
+.subckt input_stage vin_p vin_n vout_p vout_n vdd vss tail_bias load_bias
+*.PININFO vin_p:B vin_n:B vout_p:B vout_n:B vdd:B vss:B tail_bias:B load_bias:B
+M1 vout_p load_bias vss vss nfet_03v3 L=0.36u W=1.5u nf=1
+M2 vout_n load_bias vss vss nfet_03v3 L=0.36u W=1.5u nf=1
+M3 vout_p vin_n vtail vdd pfet_03v3 L=0.36u W=23u nf=8
+M5 vtail tail_bias vdd vdd pfet_03v3 L=0.54u W=9u nf=3
+M4 vout_n vin_p vtail vdd pfet_03v3 L=0.36u W=23u nf=8
+.ends
+
+
+* expanding   symbol:  OTA/output_stage/output_stage.sym # of pins=7
+** sym_path: /foss/designs/OTA/output_stage/output_stage.sym
+** sch_path: /foss/designs/OTA/output_stage/output_stage.sch
+.subckt output_stage vdd vss vin_p vin_n vout_p vout_n load_bias
+*.PININFO vdd:B vss:B vin_p:B vin_n:B vout_p:B vout_n:B load_bias:B
+M1 vout_n vin_p vss vss nfet_03v3 L=0.54u W=32.6u nf=10
+M2 vout_n load_bias vdd vdd pfet_03v3 L=0.54u W=39u nf=13
+XC2 vout_n vin_p cap_mim_2f0fF c_width=36e-6 c_length=28e-6
+XC1 vout_p vin_n cap_mim_2f0fF c_width=36e-6 c_length=28e-6
+M4 vout_p load_bias vdd vdd pfet_03v3 L=0.54u W=39u nf=13
+M3 vout_p vin_n vss vss nfet_03v3 L=0.54u W=32.6u nf=10
+.ends
+
