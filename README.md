@@ -701,7 +701,7 @@ The design targets:
 Approximate available block dimensions:
 
 ```text
-500 µm × 1100 µm
+250 µm × 280 µm
 ```
 
 The architecture has been designed to fit within the available Chipathon area and interface constraints.
