@@ -3,12 +3,49 @@
 # LICENSE: Apache License Version 2.0
 # http://www.apache.org/licenses/
 # ----- ------ ----- ----- ------ ----- ----- ------ -----
+
 # data will be pulled from main branch of the repo.
 # please be sure that the main branch contains the data you want to submit.
+# This file will be updated with more information later
 
+# ======================================================
+# Project metadata (used for documentation / review)
+# ======================================================
 project:
-  title: "Ultra-Low-Power Event-Driven ECG Sensor SoC with Analog R-Peak Detection"
-  team: "B08 Biosignal Foundry"
-  discord: ""
-  description: "GF180MCU CCIA dry-run submission for the Biosignal Foundry event-driven ECG sensor SoC."
+  title: "Ultra-Low-Power Event-Driven ECG Sensor SoC in GF180MCU"
+  team: "B08-Biosignal Foundry"
+  discord: "Varchaswin"
+  description: "Ultra-Low-Power ECG Sensor SoC with Ananlog R-Peak Detetion"
   lvs_config: "lvs_config.json"
+
+pins:
+  - name: VSS
+    io_type: ground
+  - name: VDD
+    io_type: power
+  - name: electrode_p
+    io_type: analog
+    secondary_esd: true
+  - name: electrode_n
+    io_type: analog
+    secondary_esd: true
+  - name: CLK
+    io_type: digital
+  - name: START
+    io_type: analog
+    secondary_esd: true
+  - name: VDET
+    io_type: analog
+    secondary_esd: true
+  - name: VREF
+    io_type: analog
+    secondary_esd: true
+  - name: VBIAS
+    io_type: analog
+    secondary_esd: true
+  - name: VTRIM
+    io_type: analog
+    secondary_esd: true
+  - name: INA_OUT
+    io_type: analog
+    secondary_esd: true
