@@ -1,10 +1,10 @@
 ** sch_path: /foss/designs/TOP.sch
-.subckt TOP VDD VSS electrode_p electrode_n CLK START VDET VREF VBIAS VTRIM INA_OUT
-*.PININFO VDD:B VSS:B electrode_p:B electrode_n:B CLK:B START:B VDET:B VREF:B VBIAS:B VTRIM:B INA_OUT:B
-x1 VDD VSS electrode_p electrode_n INA_OUT VTRIM REF VBIAS VBIAS Phi1 Phi1b Phi2 Phi2b CCIA_chopped
+.subckt TOP VDD VSS electrode_p electrode_n CLK START VDET VREF VBIAS INA_OUT
+*.PININFO VDD:B VSS:B electrode_p:B electrode_n:B CLK:B START:B VDET:B VREF:B VBIAS:B INA_OUT:B
+x1 VDD VSS electrode_p electrode_n INA_OUT net1 REF VBIAS VBIAS Phi1 Phi1b Phi2 Phi2b CCIA_chopped
 XBPF1 SINGLE_OUT VREF VBIAS VBIAS VDD VSS BPF gf180_ecg_bpf
 x2 CLK Phi1 Phi1b Phi2 Phi2b VDD VSS gf180_nonoverlap_clkgen
-x3 INA_OUT VTRIM VREF SINGLE_OUT VBIAS VDD VSS gf180_diff2se_gain R1=1Meg R2=2Meg
+x3 INA_OUT net1 VREF SINGLE_OUT VBIAS VDD VSS gf180_diff2se_gain R1=1Meg R2=2Meg
 XDIFF1 BPF VREF VBIAS VDD VSS DIFF gf180_ecg_differentiator
 XSQT1 DIFF DIFF VREF VREF VDD VSS INT gf180_ecg_squarer_transistor
 XINT1 INT VREF VBIAS VBIAS VDD VSS gf180_ecg_integrator

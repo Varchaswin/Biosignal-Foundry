@@ -8,9 +8,9 @@ E {}
 N -300 -20 -270 -20 {lab=INA_OUT}
 N -270 -45 -270 -20 {lab=INA_OUT}
 N -270 -45 -220 -45 {lab=INA_OUT}
-N -300 20 -270 20 {lab=VTRIM}
-N -270 20 -270 45 {lab=VTRIM}
-N -270 45 -220 45 {lab=VTRIM}
+N -300 20 -270 20 {lab=#net1}
+N -270 20 -270 45 {lab=#net1}
+N -270 45 -220 45 {lab=#net1}
 N -135 440 175 440 {lab=INT}
 N 20 -0 50 -0 {lab=SINGLE_OUT}
 N 290 -0 320 -0 {lab=BPF}
@@ -64,14 +64,12 @@ C {devices/lab_pin.sym} 435 465 0 1 {name=pbd31 lab=VDET}
 C {devices/lab_pin.sym} 40 0 3 1 {name=pbd32 lab=SINGLE_OUT}
 C {devices/lab_pin.sym} 310 0 3 1 {name=pbd33 lab=BPF}
 C {devices/lab_pin.sym} -260 -45 3 1 {name=pbd34 lab=INA_OUT}
-C {devices/lab_pin.sym} -260 45 1 1 {name=pbd35 lab=VTRIM}
 C {devices/lab_pin.sym} 560 0 0 1 {name=pbd36 lab=DIFF}
 C {devices/lab_pin.sym} 0 440 1 1 {name=pbd37 lab=INT}
 C {devices/lab_pin.sym} -415 400 2 1 {name=pbd39 lab=DIFF}
 C {devices/lab_pin.sym} -415 480 2 1 {name=pbd40 lab=DIFF}
 C {devices/iopin.sym} -400 -355 2 0 {name=p_vdd7 lab=VREF}
 C {devices/iopin.sym} -400 -320 2 0 {name=p_vdd8 lab=VBIAS}
-C {devices/iopin.sym} -400 -295 2 0 {name=p_vdd9 lab=VTRIM}
 C {devices/iopin.sym} -400 -275 2 0 {name=p_vdd10 lab=INA_OUT}
 C {devices/lab_pin.sym} -450 160 1 1 {name=pbd41 lab=VBIAS}
 C {devices/lab_pin.sym} -390 160 1 1 {name=pbd42 lab=VBIAS}
