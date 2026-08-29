@@ -30,7 +30,8 @@ pins:
     io_type: analog
     secondary_esd: true
   - name: CLK
-    io_type: digital
+    io_type: analog
+    secondary_esd: true
   - name: START
     io_type: analog
     secondary_esd: true
@@ -41,9 +42,6 @@ pins:
     io_type: analog
     secondary_esd: true
   - name: VBIAS
-    io_type: analog
-    secondary_esd: true
-  - name: VTRIM
     io_type: analog
     secondary_esd: true
   - name: INA_OUT
