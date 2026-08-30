@@ -30,8 +30,7 @@ pins:
     io_type: analog
     secondary_esd: true
   - name: CLK
-    io_type: analog
-    secondary_esd: true
+    io_type: input_schmitt
   - name: START
     io_type: analog
     secondary_esd: true
